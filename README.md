@@ -1,4 +1,4 @@
-# ini
+# ak-ini
 
 ## Requirements
 
@@ -30,3 +30,12 @@ Run the script
 ```
 node ./tools/convert-db.js
 ```
+
+You may need to manually remove/ignore one or two rows when importing the csv
+
+## What is this?
+
+
+## What is this?
+
+Simply convert the contents of `data/db/*.ini` files to make it compatible with CSV readers.
