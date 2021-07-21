@@ -49,6 +49,9 @@ function rowSplitter(input, encodedData) {
     switch (filename) {
         case 't_biology': 
             return encodedData.toString().split(/\x7C\x0D\x0A/)
+        case 'c_itemmall':
+            return encodedData.toString().replace(/\x7C\x0D\x0A/g, "\r\n")
+            .replace('\n','').split("|\r\n")
         default:
             return encodedData.toString().replace(/\x0D\x0A/g, "").split("|\n")
     }
@@ -73,11 +76,58 @@ function parseLine(input, row) {
         case 't_biology':
             line = row.replace(/\x0D\x0A/g,"")
             break;
+        case 'c_itemmall':
+            line = row.toString().trim();
+            line = row.replace(/\x0D\x0A/g, LINEFEED_TAG)
+            break;
         default:
             line = row.toString().trim();
-            
-            line = row.replace(/\x0A/g, LINEFEED_TAG)
+            line = row.replace(/\x0D\x0A/g, LINEFEED_TAG)
             break;
     }
     return line;
 }
+
+
+function convert(input, output) {
+    let content = []; 
+    const streamWriter = fs.createWriteStream(output);
+ 
+    const rawData = fs.readFileSync(input);
+    const encodedData = iconv.decode(rawData,'big5')
+    const rows = rowSplitter(input, encodedData)
+    
+    console.log(`read: ${input}`)
+    
+    rows.forEach((row) => {  
+        const line = parseLine(input, row.trim());
+        content.push(line);
+    })
+
+    streamWriter.write(iconv.encode(content.join('\r\n'),'utf-8'))
+    
+    console.log(`write: ${output}`)
+}
+
+(function main() {
+    // Output directory, relative to our root project
+    const OUTPUT = path.resolve("data/converted")
+
+    // TODO: Just read all /((?!T|C)_)*\.ini$/ files in `db` directory
+
+    // List of filenames to process. DOES NOT support wildcards
+    // please use exact filenames with extension.
+    const files = [
+        // 'C_Biology copy.ini'
+        'C_ItemMall.ini',
+        'C_Biology.ini',
+        'T_Biology.ini',
+        "C_DropItem.ini",
+        // 'C_ItemMall copy.ini'`
+    ]
+
+    // Convert 
+    files.forEach(db => {
+        convert(getDataDBFilePath(db), path.join(OUTPUT, db.replace('.ini', '.csv')))
+    })
+})()
