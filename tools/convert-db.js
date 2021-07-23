@@ -88,6 +88,27 @@ function parseLine(input, row) {
     return line;
 }
 
+/**
+ * This function will skip the first line of the ini file 
+ * The first line of the ini file is usually the version and column count 
+ * Some files have more that 1 metadata so we need to conditionally remove
+ * those lines based on their filename.
+ * 
+ * @param {String} input 
+ * @param {Number} index 
+ * @returns {Boolean|undefined}
+ */
+function skipLines(input, index) {
+    const filename = getFilename(input).toString().toLowerCase();
+
+    if(index == 0) {
+        return true
+    }
+
+    if(filename == 't_biology' && index <= 1) {
+        return true
+    } 
+}
 
 function convert(input, output) {
     let content = []; 
@@ -99,7 +120,10 @@ function convert(input, output) {
     
     console.log(`read: ${input}`)
     
-    rows.forEach((row) => {  
+    rows.forEach((row, i) => {
+        if(skipLines(input, i)) {
+            return 
+        }
         const line = parseLine(input, row.trim());
         content.push(line);
     })
@@ -109,7 +133,7 @@ function convert(input, output) {
     console.log(`write: ${output}`)
 }
 
-(function main() {
+module.exports = function handler(files) {
     // Output directory, relative to our root project
     const OUTPUT = path.resolve("data/converted")
 
@@ -117,17 +141,10 @@ function convert(input, output) {
 
     // List of filenames to process. DOES NOT support wildcards
     // please use exact filenames with extension.
-    const files = [
-        // 'C_Biology copy.ini'
-        'C_ItemMall.ini',
-        'C_Biology.ini',
-        'T_Biology.ini',
-        "C_DropItem.ini",
-        // 'C_ItemMall copy.ini'`
-    ]
 
     // Convert 
     files.forEach(db => {
         convert(getDataDBFilePath(db), path.join(OUTPUT, db.replace('.ini', '.csv')))
     })
-})()
+}
+
