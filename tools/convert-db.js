@@ -47,6 +47,7 @@ function getFilename(input) {
 function rowSplitter(input, encodedData) {
     const filename = getFilename(input).toString().toLowerCase();
     switch (filename) {
+        case 't_item':
         case 't_biology': 
             return encodedData.toString().split(/\x7C\x0D\x0A/)
         case 'c_itemmall':
@@ -73,6 +74,7 @@ function parseLine(input, row) {
     let line = row;
     const filename = getFilename(input).toString().toLowerCase();
     switch (filename) {
+
         case 't_biology':
             line = row.replace(/\x0D\x0A/g,"")
             break;
@@ -105,7 +107,7 @@ function skipLines(input, index) {
         return true
     }
 
-    if(filename == 't_biology' && index <= 1) {
+    if(['t_biology','t_item'].includes(filename) && index <= 1) {
         return true
     } 
 }
@@ -136,11 +138,6 @@ function convert(input, output) {
 module.exports = function handler(files) {
     // Output directory, relative to our root project
     const OUTPUT = path.resolve("data/converted")
-
-    // TODO: Just read all /((?!T|C)_)*\.ini$/ files in `db` directory
-
-    // List of filenames to process. DOES NOT support wildcards
-    // please use exact filenames with extension.
 
     // Convert 
     files.forEach(db => {
