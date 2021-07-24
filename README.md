@@ -1,4 +1,5 @@
 # ak-ini
+Convert Aura Kingdom ini files to readable DSV format 
 
 ## Requirements
 
@@ -28,7 +29,7 @@ GAME_PATH=~/aura-kingdom/unpack/
 Run the script
 
 ```
-node ./tools/convert-db.js
+node ./tools/convert.js
 ```
 
 You may need to manually remove/ignore one or two rows when importing the csv
