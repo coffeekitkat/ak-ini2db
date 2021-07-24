@@ -82,7 +82,7 @@ function parseLine(input, row) {
             break;
         default:
             line = row.toString().trim();
-            line = row.replace(/\x0D\x0A/g, LINEFEED_TAG)
+            line = row.replace(/\x0D\x0A/g, LINEFEED_TAG).replace(/\x0A/g,"")
             break;
     }
     return line;
