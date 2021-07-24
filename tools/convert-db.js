@@ -35,7 +35,7 @@ function getFilename(input) {
 
 /**
  * Each `.ini` file is really broken because it uses inconsistent line-endings and 
- * some columns contains new lines that also uses are sometimes either CRLF or just an LF
+ * some columns contains new-lines that also uses CRLF or just an LF as line-terminator
  * so we need to define how we are gonna parse the file and 
  * determine what are the rows for each file.
  * 
