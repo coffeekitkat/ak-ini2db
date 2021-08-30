@@ -46,15 +46,20 @@ function getFilename(input) {
  */
 function rowSplitter(input, encodedData) {
     const filename = getFilename(input).toString().toLowerCase();
+    console.log(`rowSplitter:`, filename)
     switch (filename) {
+        case 't_combine':
+            return encodedData.toString().replace('\n','').split(/\x7C\x0D\x0A/)
         case 't_item':
         case 't_biology': 
             return encodedData.toString().split(/\x7C\x0D\x0A/)
         case 'c_itemmall':
-            return encodedData.toString().replace(/\x7C\x0D\x0A/g, "\r\n")
-            .replace('\n','').split("|\r\n")
+            // return encodedData.toString().replace(/\x7C\x0D\x0A/g, "\r\n").replace('\n','').split("|\r\n")
+        case 'c_combine':
+            return encodedData.toString().split(/\x7C\x0D\x0A/)
         default:
-            return encodedData.toString().replace(/\x0D\x0A/g, "").split("|\n")
+            return encodedData.toString().replace(/\x7C\x0D\x0A/g, "\r\n").replace('\n','').split("|\r\n")
+            // return encodedData.toString().replace(/\x0D\x0A/g, "").split("|\n")
     }
 }
 
@@ -74,7 +79,8 @@ function parseLine(input, row) {
     let line = row;
     const filename = getFilename(input).toString().toLowerCase();
     switch (filename) {
-
+        case 't_combine':
+            line = row.replace(/\x0A/g,"{aaa}")
         case 't_biology':
             line = row.replace(/\x0D\x0A/g,"")
             break;
@@ -102,12 +108,12 @@ function parseLine(input, row) {
  */
 function skipLines(input, index) {
     const filename = getFilename(input).toString().toLowerCase();
-
+    
     if(index == 0) {
         return true
     }
 
-    if(['t_biology','t_item'].includes(filename) && index <= 1) {
+    if(['t_biology','t_item', 't_combine'].includes(filename) && index <= 1) {
         return true
     } 
 }
@@ -118,16 +124,17 @@ function convert(input, output) {
  
     const rawData = fs.readFileSync(input);
     const encodedData = iconv.decode(rawData,'big5')
-    const rows = rowSplitter(input, encodedData)
-    
-    console.log(`read: ${input}`)
+    const rows = rowSplitter(input, encodedData) 
+    console.log(`read: ${input}, rows: ${rows.length}`)
     
     rows.forEach((row, i) => {
         if(skipLines(input, i)) {
+            console.log(`skip line ${input}`, i)
             return 
-        }
-        const line = parseLine(input, row.trim());
-        content.push(line);
+        } 
+            const line = parseLine(input, row.trim());
+            content.push(line);
+       
     })
 
     streamWriter.write(iconv.encode(content.join('\r\n'),'utf-8'))
