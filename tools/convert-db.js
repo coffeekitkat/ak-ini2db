@@ -54,6 +54,7 @@ function rowSplitter(input, encodedData) {
         case 't_biology': 
             return encodedData.toString().split(/\x7C\x0D\x0A/)
         case 'c_itemmall':
+            return encodedData.toString().replace(/\x7C\x09\x0D\x0A/g,"|\r\n").split(/\x7C\x0D\x0A/)
             // return encodedData.toString().replace(/\x7C\x0D\x0A/g, "\r\n").replace('\n','').split("|\r\n")
         case 'c_combine':
             return encodedData.toString().split(/\x7C\x0D\x0A/)
@@ -80,7 +81,7 @@ function parseLine(input, row) {
     const filename = getFilename(input).toString().toLowerCase();
     switch (filename) {
         case 't_combine':
-            line = row.replace(/\x0A/g,"{aaa}")
+            line = row.replace(/\x0A/g,"")
         case 't_biology':
             line = row.replace(/\x0D\x0A/g,"")
             break;
