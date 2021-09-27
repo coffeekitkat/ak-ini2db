@@ -3,8 +3,17 @@ const path = require("path");
 const iconv = require("iconv-lite");
 const _ = require("lodash");
 
-const items = [
-  // '61982'
+const Mats = [
+  // Level 90
+  '17876', // Chrono Ore
+  '16242', // Soulsucker
+]
+
+const ancientEido = [
+  '11712'
+]
+
+const bpMats = [
   "61516",
   "61561",
   "61650",
@@ -17,6 +26,11 @@ const items = [
   "61560",
   "61654",
   "61655",
+]
+
+const items = [
+  // '61982'
+  ...ancientEido
 ];
 
 function loadDb(file) {
@@ -235,4 +249,4 @@ function data() {
 
 // const grouped = _.groupBy(_.flatten(db), 'itemName')
 let db = data();
-fs.writeFileSync("drop.json", JSON.stringify(db, null, 2));
+fs.writeFileSync("Ancient Eidolon Fragments.json", JSON.stringify(db, null, 2));
