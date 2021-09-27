@@ -53,10 +53,20 @@ function rowSplitter(input, encodedData) {
         case 't_item':
         case 't_biology': 
             return encodedData.toString().split(/\x7C\x0D\x0A/)
-        case 'c_itemmall':
-            return encodedData.toString().replace(/\x7C\x09\x0D\x0A/g,"|\r\n").split(/\x7C\x0D\x0A/)
-            // return encodedData.toString().replace(/\x7C\x0D\x0A/g, "\r\n").replace('\n','').split("|\r\n")
         case 'c_combine':
+        case 'c_dropitem':
+        case 'c_biology':
+            return encodedData.toString().replace(/\x7C\x09\x0D\x0A/g,"|\r\n")
+            .replace(/\x7C\x0A/g,'|\r\n')
+            .split(/\x7C\x0D\x0A/)
+        // case 'c_itemmall':
+        //     return encodedData.toString().replace(/\x0A/g, LINEFEED_TAG)
+        //         .replace(new RegExp( "|" + LINEFEED_TAG, "g"), "|\r\n")
+        //         .split(/\x7C\x0D\x0A/)
+            // v0029
+            // return encodedData.toString().replace(/\x7C\x09\x0D\x0A/g,"|\r\n").split(/\x7C\x0D\x0A/)
+            // return encodedData.toString().replace(/\x7C\x0D\x0A/g, "\r\n").replace('\n','').split("|\r\n")
+        case 'c_combine2':
             return encodedData.toString().split(/\x7C\x0D\x0A/)
         default:
             return encodedData.toString().replace(/\x7C\x0D\x0A/g, "\r\n").replace('\n','').split("|\r\n")
@@ -67,7 +77,7 @@ function rowSplitter(input, encodedData) {
 /**
  * To make things compatible with CSV importers, we need to make sure that 
  * a record only occupies one row even.
- * 
+ * `
  * Here we are replacing a column value that has a new-line with a custom tag for
  * export compatibility purposes.
  * Example: If we import the CSV on a database, we can replace the tag with actual LF or CRLF 
@@ -125,7 +135,7 @@ function convert(input, output) {
  
     const rawData = fs.readFileSync(input);
     const encodedData = iconv.decode(rawData,'big5')
-    const rows = rowSplitter(input, encodedData) 
+    const rows = rowSplitter(input, encodedData.replace(/\"/g, '\\"')) 
     console.log(`read: ${input}, rows: ${rows.length}`)
     
     rows.forEach((row, i) => {
